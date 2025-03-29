@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'ticket_list_page.dart';
 import 'history_page.dart';
 import 'account_page.dart';
-import 'ticket_page.dart';
 
 class CustomerHomePage extends StatefulWidget {
-  final int initialIndex; // Thêm tham số này
+  final int initialIndex;
 
-  // Constructor nhận initialIndex (Mặc định là 0 nếu không truyền)
   CustomerHomePage({this.initialIndex = 0});
 
   @override
@@ -20,16 +18,22 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex; // Gán giá trị từ constructor
+    _currentIndex = widget.initialIndex;
   }
 
-  final List<Widget> _pages = [
-    CustomerHomeContent(),
-    TicketListPage(),
-    TicketPage(),
-    HistoryPage(),
-    AccountPage(),
-  ];
+  final List<Widget> _pages = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _pages.clear();
+    _pages.addAll([
+      CustomerHomeContent(onTicketPressed: () => _onTabTapped(1)), // Truyền callback
+      TicketListPage(),
+      HistoryPage(),
+      AccountPage(),
+    ]);
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -60,6 +64,10 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
 
 
 class CustomerHomeContent extends StatelessWidget {
+  final VoidCallback onTicketPressed;
+
+  CustomerHomeContent({required this.onTicketPressed});
+
   @override
   Widget build(BuildContext context) {
     Map<String, int> usedTickets = {
@@ -77,13 +85,14 @@ class CustomerHomeContent extends StatelessWidget {
           _buildInfoCard("Số vé còn lại của bạn:", {"Tổng vé": 0}),
           SizedBox(height: 15),
           _buildInfoCard("Số vé sử dụng trong tháng", usedTickets),
-          _buildTicketButton("Vé của tôi", () {}),
+          _buildTicketButton("Vé của tôi", onTicketPressed), // Gọi callback
           SizedBox(height: 20),
         ],
       ),
     );
   }
 }
+
 
 Widget _buildHeader() {
   return Container(
@@ -120,7 +129,6 @@ Widget _buildInfoCard(String title, Map<String, int> ticketData) {
     child: Container(
       width: double.infinity,
       padding: EdgeInsets.all(16),
-     
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
@@ -143,11 +151,11 @@ Widget _buildInfoCard(String title, Map<String, int> ticketData) {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      entry.key, // Tên loại vé
+                      entry.key,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      "${entry.value} vé", // Số lượng vé
+                      "${entry.value} vé",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                   ],
@@ -164,50 +172,23 @@ Widget _buildInfoCard(String title, Map<String, int> ticketData) {
 Widget _buildTicketButton(String text, VoidCallback onPressed) {
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: 20),
-    child: TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 150),
-      tween: Tween(begin: 1.0, end: 1.0),
-      builder: (context, scale, child) {
-        return GestureDetector(
-          onTapDown: (_) {
-            // Khi bấm, nút thu nhỏ lại
-            (context as Element).markNeedsBuild();
-            scale = 0.9;
-          },
-          onTapUp: (_) {
-            // Khi thả, nút quay lại kích thước ban đầu
-            (context as Element).markNeedsBuild();
-            scale = 1.0;
-            onPressed();
-          },
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            transform: Matrix4.identity()..scale(scale),
-            margin: EdgeInsets.symmetric(vertical: 20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber[700],
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    side: BorderSide(color: Colors.black, width: 1),
-                  ),
-                ),
-                child: Text(
-                  text,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-            ),
+    child: SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.amber[700],
+          padding: EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(color: Colors.black, width: 1),
           ),
-        );
-      },
+        ),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+      ),
     ),
   );
 }
-
-
