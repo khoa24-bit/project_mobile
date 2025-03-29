@@ -81,10 +81,11 @@ class CustomerHomeContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildHeader(),
-          SizedBox(height: 60),
+          SizedBox(height: 40),
           _buildInfoCard("Số vé còn lại của bạn:", {"Tổng vé": 0}),
-          SizedBox(height: 15),
+          SizedBox(height: 25),
           _buildInfoCard("Số vé sử dụng trong tháng", usedTickets),
+          SizedBox(height: 30),
           _buildTicketButton("Vé của tôi", onTicketPressed), // Gọi callback
           SizedBox(height: 20),
         ],
