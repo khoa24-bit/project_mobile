@@ -89,34 +89,50 @@ class _TicketListPageState extends State<TicketListPage> {
   }
 
   /// Chi tiết vé với QR Code
-  void showTicketDetail(Map<String, dynamic> ticket) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Chi tiết vé"),
-          content: Column(
+ void showTicketDetail(Map<String, dynamic> ticket) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Chi tiết vé"),
+        content: SingleChildScrollView(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(ticket["type"], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               SizedBox(height: 20),
-              qr.QrImageView(data: ticket["qrData"], version: qr.QrVersions.auto, size: 200),
+              Container(
+                padding: EdgeInsets.all(10),
+                color: Colors.white, // Nền trắng để QR Code rõ hơn
+                child: SizedBox(
+                  width: 200, // Đặt kích thước cụ thể cho QR Code
+                  height: 200,
+                  child: qr.QrImageView(
+                    data: ticket["qrData"] ?? "UNKNOWN",
+                    version: qr.QrVersions.auto,
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               Text("Mã vé: ${ticket["qrData"]}", style: TextStyle(fontSize: 18)),
               SizedBox(height: 10),
               Text("Số vé còn lại: ${ticket["remaining"]}", style: TextStyle(fontSize: 18)),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Đóng"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("Đóng"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
 
   /// Giao diện mua vé
   Widget buildBuyTicketScreen() {
