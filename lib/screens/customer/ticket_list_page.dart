@@ -36,19 +36,26 @@ class _TicketListPageState extends State<TicketListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isBuyingTicket ? "Mua vé" : "Vé của tôi"),
-        backgroundColor: Colors.blue,
-        leading: isBuyingTicket
-            ? IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    isBuyingTicket = false;
-                  });
-                },
-              )
-            : null,
-      ),
+  title: Padding(
+    padding: EdgeInsets.only(top: 10, bottom: 5), // Lùi xuống 10px
+    child: Text(
+      isBuyingTicket ? "Mua vé" : "Vé của tôi",
+      style: TextStyle(fontSize: 30, color: Colors.black),
+    ),
+  ),
+  backgroundColor: Colors.blue,
+  leading: isBuyingTicket
+      ? IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            setState(() {
+              isBuyingTicket = false;
+            });
+          },
+        )
+      : null,
+),
+
       body: isBuyingTicket ? buildBuyTicketScreen() : buildTicketListScreen(),
     );
   }
