@@ -7,7 +7,7 @@ class DriverHomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Trang tài xế"),
-        backgroundColor: Colors.green[600],
+        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Text(

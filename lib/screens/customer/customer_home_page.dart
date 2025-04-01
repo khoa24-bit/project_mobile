@@ -28,13 +28,12 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     super.didChangeDependencies();
     _pages.clear();
     _pages.addAll([
-      CustomerHomeContent(onTicketPressed: () => _onTabTapped(1)), // Truyền callback
+      CustomerHomeContent(onTicketPressed: () => _onTabTapped(1)),
       TicketListPage(),
       HistoryPage(),
       AccountPage(),
     ]);
   }
-
 
   void _onTabTapped(int index) {
     setState(() {
@@ -63,7 +62,6 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   }
 }
 
-
 class CustomerHomeContent extends StatelessWidget {
   final VoidCallback onTicketPressed;
 
@@ -78,23 +76,24 @@ class CustomerHomeContent extends StatelessWidget {
     };
 
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 40),
-          _buildInfoCard("Số vé còn lại của bạn:", {"Tổng vé": 0}),
-          SizedBox(height: 25),
-          _buildInfoCard("Số vé sử dụng trong tháng", usedTickets),
-          SizedBox(height: 30),
-          _buildTicketButton("Vé của tôi", onTicketPressed), // Gọi callback
-          SizedBox(height: 20),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 40),
+            _buildInfoCard("Số vé còn lại của bạn:", {"Tổng vé": 0}),
+            SizedBox(height: 25),
+            _buildInfoCard("Số vé sử dụng trong tháng", usedTickets),
+            SizedBox(height: 30),
+            _buildTicketButton("Vé của tôi", onTicketPressed),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 }
-
 
 Widget _buildHeader() {
   return Container(

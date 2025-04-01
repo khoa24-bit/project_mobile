@@ -41,19 +41,19 @@ class _LoginPageState extends State<LoginPage> {
     _isLoading = false;
   });
 
-  if (account == "k" && password == "1") {
+  if (account == "c" && password == "1") {
     // Điều hướng đến trang chính của khách hàng
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => CustomerHomePage()),
     );
-  } else if (account == "driver" && password == "123456") {
+  } else if (account == "d" && password == "1") {
     // Điều hướng đến trang chính của tài xế
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => DriverHomePage()),
     );
-  } else if (account == "admin" && password == "123456") {
+  } else if (account == "ad" && password == "1") {
     // Điều hướng đến trang chính của admin
     Navigator.pushReplacement(
       context,

@@ -18,7 +18,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   /// Hàm giả lập lấy dữ liệu lịch sử vé (dữ liệu tĩnh)
   Future<void> fetchTicketHistory() async {
-    await Future.delayed(Duration(seconds: 1)); // Giả lập độ trễ API
+    await Future.delayed(Duration(seconds: 0)); // Giả lập độ trễ API
     setState(() {
       tickets = [
         {'type': 'Xe khách đỏ', 'used_at': '2025-03-28T08:30:00Z'},

@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
+import '../auth/login_page.dart'; // Import trang đăng nhập
+
 class AccountPage extends StatefulWidget {
   @override
   _AccountPageState createState() => _AccountPageState();
@@ -58,8 +60,8 @@ class _AccountPageState extends State<AccountPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Profile',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          'Thông tin tài khoản',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.blue,
@@ -101,6 +103,7 @@ class _AccountPageState extends State<AccountPage> {
             _buildGenderField(),
             SizedBox(height: 20),
             if (isEditing) _buildButton('Cập nhật', Colors.green),
+            _buildLogoutButton(),
             SizedBox(height: 20),
           ],
         ),
@@ -193,7 +196,7 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  // Nút cập nhật
+  // Nút cập nhật thông tin
   Widget _buildButton(String text, Color color) {
     return ElevatedButton(
       onPressed: () {
@@ -211,5 +214,45 @@ class _AccountPageState extends State<AccountPage> {
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
+  }
+
+  // Nút đăng xuất
+  Widget _buildLogoutButton() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: ElevatedButton(
+        onPressed: _confirmLogout,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        child: Text(
+          'Đăng xuất',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  // Hiển thị hộp thoại xác nhận đăng xuất
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Xác nhận"),
+          content: Text("Bạn có chắc chắn muốn đăng xuất không?"),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(), child: Text("Hủy")),
+            TextButton(onPressed: _logout, child: Text("Đăng xuất", style: TextStyle(color: Colors.red))),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout() {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }
