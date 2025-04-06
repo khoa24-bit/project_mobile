@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../customer/account_page.dart';
 import 'customer_list_page.dart';
+import 'driver_detail_page.dart';
 import 'driver_list_page.dart';
 
 class AdminHomePage extends StatelessWidget {
-  const AdminHomePage({super.key});
+  final String token;
+  AdminHomePage({required this.token});
+
 
   Widget statCard(String label, String value,
       {double width = double.infinity}) {
@@ -101,7 +104,7 @@ class AdminHomePage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => AccountPage()),
+                        MaterialPageRoute(builder: (_) => CustomerListPage()),
                       );
                     },
                   ),
