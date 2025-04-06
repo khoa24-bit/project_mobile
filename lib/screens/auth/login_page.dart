@@ -3,7 +3,9 @@ import 'register_page.dart';
 import 'package:mobile/screens/customer/customer_home_page.dart';
 import 'package:mobile/screens/driver/driver_home_page.dart';
 import 'package:mobile/screens/admin/admin_home_page.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -35,35 +37,51 @@ class _LoginPageState extends State<LoginPage> {
     _isLoading = true;
   });
 
-  await Future.delayed(Duration(seconds: 2));
+  final url = 'http://localhost:8080/auth/login';
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {"Content-Type": "application/json"},
+    body: json.encode({
+      "email": account,
+      "password": password,
+    }),
+  );
 
   setState(() {
     _isLoading = false;
   });
 
-  if (account == "c" && password == "1") {
-    // Điều hướng đến trang chính của khách hàng
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => CustomerHomePage()),
-    );
-  } else if (account == "d" && password == "1") {
-    // Điều hướng đến trang chính của tài xế
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => DriverHomePage()),
-    );
-  } else if (account == "ad" && password == "1") {
-    // Điều hướng đến trang chính của admin
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => AdminHomePage()),
-    );
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    String token = data['token'];
+    String role = data['role'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+    await prefs.setString('role', role);
+
+    // Điều hướng đến trang tương ứng
+    if (role == 'CUSTOMER') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => CustomerHomePage(token: token)),
+      );
+    } else if (role == 'DRIVER') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DriverHomePage(token: token)),
+      );
+    } else if (role == 'ADMIN') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AdminHomePage(token: token)),
+      );
+    }
   } else {
     _showDialog("Lỗi", "Sai tài khoản hoặc mật khẩu!");
   }
 }
-
 
   void _showDialog(String title, String message) {
     showDialog(

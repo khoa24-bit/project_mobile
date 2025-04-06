@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 
 class AdminHomePage extends StatelessWidget {
+  final String token;
+
+  AdminHomePage({required this.token});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Trang quản trị"),
-        backgroundColor: Colors.red[600],
+        title: Text('Trang Quản Trị'),
+        backgroundColor: Colors.red[600], // Màu nền AppBar cho phù hợp với admin
       ),
       body: Center(
         child: Text(
-          "Chào mừng bạn đến với trang quản trị!",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          'Token: $token',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Style cho token
         ),
       ),
     );

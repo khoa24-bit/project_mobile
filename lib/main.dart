@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import './screens/auth/login_page.dart';
-import './screens/customer/customer_home_page.dart';
+import 'screens/splash_screen.dart'; // <- Thêm dòng này
 
 void main() {
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => TicketModel(),
+      child: MyApp(),
+    ),
+    );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,8 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
-      // home: CustomerHomePage(),
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+      ),
+      home: SplashScreen(), // <- Đổi thành SplashScreen
     );
   }
 }
