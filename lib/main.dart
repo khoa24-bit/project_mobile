@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Roboto',
-      ),
+      )
       home: SplashScreen(), // <- Đổi thành SplashScreen
     );
   }

@@ -113,7 +113,10 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                   userInfo: _userInfo,
                   tickets: _tickets,
                 ),
-                TicketListPage(token: widget.token),
+                TicketListPage(
+                  token: widget.token,
+                  onTicketBought: _fetchTickets, // Gọi lại _fetchTickets khi mua vé thành công
+                ),
                 HistoryPage(token: widget.token),
                 AccountPage(token: widget.token),
               ],
@@ -133,6 +136,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     );
   }
 }
+
 
 class CustomerHomeContent extends StatelessWidget {
   final Map<String, dynamic>? userInfo;
@@ -218,7 +222,14 @@ class CustomerHomeContent extends StatelessWidget {
                         margin: EdgeInsets.only(bottom: 15),
                         child: ListTile(
                           title: Text("Loại vé: $ticketType", style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text("Mã vé: ${ticketGroup.first['id']}"),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Mã vé: ${ticketGroup.first['id']}"),
+                              // SizedBox(height: 4),
+                              Text("Số vé còn lại: ${ticketGroup.length}"),
+                            ],
+                          ),
                           trailing: ElevatedButton(
                             onPressed: () => _showTicketDetail(context, ticketGroup),
                             child: Text("Xem mã QR"),
@@ -255,11 +266,32 @@ Widget _buildHeader(Map<String, dynamic>? userInfo) {
           radius: 50,
           backgroundImage: AssetImage('assets/images/avatar.png'),
         ),
-        SizedBox(height: 15),
+        SizedBox(height: 5),
         Text(
           userInfo != null ? userInfo['fullName'] ?? "Người dùng" : "Đang tải...",
           style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
         ),
+        //SizedBox(height: 10),
+        userInfo != null
+            ? Align(
+                alignment: Alignment.center,  // Căn phải toàn bộ phần tử dưới
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,  // Căn phải cho text bên trong Column
+                  children: [
+                    // Text(
+                    //   "ID: ${userInfo['id']}",
+                    //   style: TextStyle(fontSize: 20, color: Color(0xFFCCCCCC)),  // Màu #DDDDDD
+                    // ),
+                    Text(
+                      "Email: ${userInfo['email']}",
+                      style: TextStyle(fontSize: 16, color: Color(0xFFCCCCCC)),  // Màu #DDDDDD
+                    ),
+                    //SizedBox(height: 5),  // Thêm một chút khoảng cách giữa email và id
+                    
+                  ],
+                ),
+              )
+            : Container(),
       ],
     ),
   );

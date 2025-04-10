@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 
 class TicketListPage extends StatefulWidget {
   final String token;
+  final Function onTicketBought; // Callback để thông báo vé đã được mua
 
-  const TicketListPage({Key? key, required this.token}) : super(key: key);
+  const TicketListPage({Key? key, required this.token, required this.onTicketBought}) : super(key: key);
 
   @override
   State<TicketListPage> createState() => _TicketListPageState();
@@ -15,7 +16,12 @@ class _TicketListPageState extends State<TicketListPage> {
   String? _selectedTicketType;
   bool _isLoading = false;
 
-  final List<String> ticketTypes = ['STANDARD', 'VIP', 'STUDENT'];
+  // Danh sách loại vé và giá tương ứng
+  final List<Map<String, String>> ticketTypes = [
+    {'type': 'STANDARD', 'price': '50,000 VND'},
+    {'type': 'VIP', 'price': '100,000 VND'},
+    {'type': 'STUDENT', 'price': '30,000 VND'},
+  ];
 
   Future<void> buyTicket() async {
     if (_selectedTicketType == null) {
@@ -50,10 +56,16 @@ class _TicketListPageState extends State<TicketListPage> {
 
       final responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        // Gọi callback sau khi mua vé thành công
+        widget.onTicketBought();
+
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("Mua vé thành công"),
+            title: Align(
+              alignment: Alignment.center, // Căn giữa tiêu đề
+              child: const Text("Mua vé thành công"),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -61,8 +73,6 @@ class _TicketListPageState extends State<TicketListPage> {
                 const SizedBox(height: 10),
                 Image.memory(
                   base64Decode(responseData['qrCode']),
-                  width: 150,
-                  height: 150,
                 ),
               ],
             ),
@@ -88,9 +98,12 @@ class _TicketListPageState extends State<TicketListPage> {
     setState(() => _isLoading = false);
   }
 
-  Widget _buildTicketOption(String type) {
+
+
+  // Cập nhật _buildTicketOption để hiển thị giá vé dưới tên loại vé
+  Widget _buildTicketOption(Map<String, String> ticket) {
     IconData icon;
-    switch (type) {
+    switch (ticket['type']) {
       case 'VIP':
         icon = Icons.workspace_premium;
         break;
@@ -107,12 +120,25 @@ class _TicketListPageState extends State<TicketListPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: RadioListTile<String>(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        value: type,
+        value: ticket['type']!,
         groupValue: _selectedTicketType,
         onChanged: (value) => setState(() => _selectedTicketType = value),
-        title: Text(
-          type,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              ticket['type']!,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Giá: ${ticket['price']}',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          ],
         ),
         secondary: Icon(icon, color: Colors.blue), // Đổi màu icon thành màu xanh
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -149,29 +175,32 @@ class _TicketListPageState extends State<TicketListPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            ...ticketTypes.map(_buildTicketOption),
+            // Duyệt qua danh sách ticketTypes và hiển thị chúng
+            ...ticketTypes.map((ticket) => _buildTicketOption(ticket)),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : buyTicket,
-                icon: const Icon(Icons.shopping_cart_checkout, color: Colors.blue), // Đổi màu icon thành xanh
-                label: const Text(
-                  "Xác nhận mua vé",
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.black, // Đổi màu chữ thành đen
-                    fontWeight: FontWeight.bold, // Chữ in đậm
+            // Căn giữa nút
+            Center(
+              child: SizedBox(
+                width: 250, // Chiều rộng nút
+                height: 50, // Chiều cao nút
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : buyTicket,
+                  label: const Text(
+                    "Xác nhận mua vé",
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.black, // Đổi màu chữ thành đen
+                      fontWeight: FontWeight.bold, // Chữ in đậm
+                    ),
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                 shape: RoundedRectangleBorder(  
-            borderRadius: BorderRadius.circular(15),  
-            side: BorderSide(color: Colors.black, width: 1),  
-          ),
-                  textStyle: const TextStyle(fontSize: 16),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      side: BorderSide(color: Colors.black, width: 1),
+                    ),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ),

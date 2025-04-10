@@ -6,6 +6,7 @@ import 'package:mobile/screens/admin/admin_home_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -75,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
     } else if (role == 'ADMIN') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AdminHomePage(token: token)),
+        MaterialPageRoute(builder: (context) => AdminHomePage()),
       );
     }
   } else {
@@ -148,6 +149,19 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 15),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPasswordPage()));
+                },
+                child: Text(
+                  "Quên mật khẩu?",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+
 
               // Chuyển hướng đến trang đăng ký
               Text("Bạn chưa có tài khoản?", style: TextStyle(fontSize: 16, color: Colors.blueGrey)),

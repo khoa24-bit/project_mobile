@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/screens/auth/login_page.dart'; // Import đúng trang login
+import 'package:mobile/providers/user_provider.dart'; // Import UserProvider
 
 class AccountPage extends StatefulWidget {
   final String token;
@@ -19,9 +20,7 @@ class _AccountPageState extends State<AccountPage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
-  String? _selectedGender = 'Nam';
-  File? _avatarImage;
+  
 
   @override
   void initState() {
@@ -40,8 +39,14 @@ class _AccountPageState extends State<AccountPage> {
       );
 
       if (response.statusCode == 200) {
+        Map<String, dynamic> userInfo = json.decode(utf8.decode(response.bodyBytes));
+        // Cập nhật thông tin người dùng vào UserProvider
+        context.read<UserProvider>().updateUserInfo(
+          _nameController.text,
+          _emailController.text,
+          _phoneController.text,
+        );
         setState(() {
-          Map<String, dynamic> userInfo = json.decode(utf8.decode(response.bodyBytes));
           _nameController.text = userInfo['fullName'] ?? '';
           _emailController.text = userInfo['email'] ?? '';
           _phoneController.text = userInfo['phone'] ?? '';
@@ -71,6 +76,12 @@ class _AccountPageState extends State<AccountPage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cập nhật thành công!')));
+        // Cập nhật lại thông tin người dùng trong UserProvider
+        context.read<UserProvider>().updateUserInfo(
+          _nameController.text,
+          _emailController.text,
+          _phoneController.text,
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cập nhật thất bại!')));
       }
@@ -80,23 +91,21 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   void _logout() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.remove('token');
-  await prefs.remove('role');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('role');
 
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => LoginPage()),
-  );
-}
-
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _dateController.dispose();
     super.dispose();
   }
 
@@ -137,9 +146,7 @@ class _AccountPageState extends State<AccountPage> {
               },
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _avatarImage != null
-                    ? FileImage(_avatarImage!)
-                    : AssetImage('assets/images/avatar.png') as ImageProvider,
+                backgroundImage: AssetImage('assets/images/avatar.png'), // Ảnh cố định từ bộ nhớ
               ),
             ),
             SizedBox(height: 10),
@@ -152,7 +159,8 @@ class _AccountPageState extends State<AccountPage> {
             _buildInputField('Email', Icons.email, _emailController),
             _buildInputField('Số điện thoại', Icons.phone, _phoneController),
             SizedBox(height: 20),
-            if (isEditing) _buildButton('Cập nhật', Colors.green),
+            if (isEditing) 
+              _buildButton('Cập nhật', Colors.green),
             SizedBox(height: 20),
             _buildLogoutButton(),
             SizedBox(height: 20),

@@ -18,67 +18,92 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isConfirmPasswordVisible = false;
   bool _isChecked = false;
 
-  void _register() async {  
-  if (_nameController.text.isEmpty ||  
-      _emailController.text.isEmpty ||  
-      _passwordController.text.isEmpty ||  
-      _confirmPasswordController.text.isEmpty ||  
-      _phoneController.text.isEmpty) {  
-    _showDialog("Lỗi", "Vui lòng nhập đầy đủ thông tin!");  
-    return;  
-  }  
-  if (_passwordController.text != _confirmPasswordController.text) {  
-    _showDialog("Lỗi", "Mật khẩu không khớp!");  
-    return;  
-  }  
-  if (!_isChecked) {  
-    _showDialog("Lỗi", "Bạn phải xác nhận không phải robot!");  
-    return;  
-  }  
+  void _register() async {
+  String name = _nameController.text.trim();
+  String email = _emailController.text.trim();
+  String password = _passwordController.text;
+  String confirmPassword = _confirmPasswordController.text;
+  String phone = _phoneController.text.trim();
 
-  final String _role = 'CUSTOMER'; // Mặc định là CUSTOMER  
+  // Kiểm tra các trường rỗng
+  if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty || phone.isEmpty) {
+    _showDialog("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
 
-  final response = await http.post(  
-    Uri.parse('http://localhost:8080/auth/register'),  
-    headers: {'Content-Type': 'application/json'},  
-    body: json.encode({  
-      'fullName': _nameController.text,  
-      'email': _emailController.text,  
-      'password': _passwordController.text,  
-      'phone': _phoneController.text, // Số điện thoại  
-      'role': _role,  
-    }),  
-  );  
+  // Kiểm tra định dạng email Gmail
+  RegExp gmailRegex = RegExp(r"^[\w-\.]+@gmail\.com$");
+  if (!gmailRegex.hasMatch(email)) {
+    _showDialog("Lỗi", "Vui lòng nhập địa chỉ Gmail hợp lệ (ví dụ: example@gmail.com).");
+    return;
+  }
 
-  if (response.statusCode == 201) {  
-    // ✅ Hiển thị thông báo khi đăng ký thành công  
-    showDialog(  
-      context: context,  
-      builder: (context) {  
-        return AlertDialog(  
-          title: Text("Thành công"),  
-          content: Text("Đăng ký thành công! "),  
-          actions: [  
-            TextButton(  
-              onPressed: () {  
-                Navigator.pop(context); // Đóng hộp thoại  
-                Navigator.pop(context); // Quay lại trang đăng nhập  
-              },  
-              child: Text("OK"),  
-            ),  
-          ],  
-        );  
-      },  
-    );  
-  } else if (response.statusCode == 400) {  
-    // Lỗi từ backend (email hoặc số điện thoại đã tồn tại)  
-    Map<String, dynamic> responseBody = json.decode(utf8.decode(response.bodyBytes)); // Sử dụng utf8.decode  
-    String errorMessage = responseBody['message'] ?? 'Đăng ký thất bại. Vui lòng thử lại.';  
-    _showDialog("Lỗi", errorMessage);  
-  } else {  
-    _showDialog("Lỗi", "Đăng ký thất bại. Vui lòng thử lại.");  
-  }  
-}  
+  // Kiểm tra mật khẩu hợp lệ
+  RegExp passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$');
+  if (!passwordRegex.hasMatch(password)) {
+    _showDialog("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
+    return;
+  }
+
+  // Kiểm tra khớp mật khẩu
+  if (password != confirmPassword) {
+    _showDialog("Lỗi", "Mật khẩu không khớp!");
+    return;
+  }
+
+  // Kiểm tra số điện thoại chỉ chứa số
+  RegExp phoneRegex = RegExp(r'^[0-9]+$');
+  if (!phoneRegex.hasMatch(phone)) {
+    _showDialog("Lỗi", "Số điện thoại chỉ được chứa số.");
+    return;
+  }
+
+  // Kiểm tra xác nhận robot
+  if (!_isChecked) {
+    _showDialog("Lỗi", "Bạn phải xác nhận không phải robot!");
+    return;
+  }
+
+  final String _role = 'CUSTOMER'; // Mặc định là CUSTOMER
+
+  final response = await http.post(
+    Uri.parse('http://localhost:8080/auth/register'),
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({
+      'fullName': name,
+      'email': email,
+      'password': password,
+      'phone': phone,
+      'role': _role,
+    }),
+  );
+
+  if (response.statusCode == 201) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Thành công"),
+        content: Text("Đăng ký thành công!"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  } else if (response.statusCode == 400) {
+    Map<String, dynamic> responseBody = json.decode(utf8.decode(response.bodyBytes));
+    String errorMessage = responseBody['message'] ?? 'Đăng ký thất bại. Vui lòng thử lại.';
+    _showDialog("Lỗi", errorMessage);
+  } else {
+    _showDialog("Lỗi", "Đăng ký thất bại. Vui lòng thử lại.");
+  }
+}
+
 
 
 
